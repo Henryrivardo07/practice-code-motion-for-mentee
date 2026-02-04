@@ -11,11 +11,10 @@ import {
   UIBlockTitle, // Komponen untuk judul practice
   UIBlockTrigger, // Tab/trigger untuk switch antar practice
 } from '@/components/ui/ui-block';
+
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash'; // Hook untuk scroll ke hash URL
 // Import komponen dashboard cards dari folder dashboard-cards
 import {
-  ConversionCard, // Card untuk conversion metrics
-  OrdersCard, // Card untuk orders metrics
   RevenueCard, // Card untuk revenue metrics
   UsersCard, // Card untuk users metrics
 } from './dashboard-cards';
@@ -23,22 +22,20 @@ import MultiStageForm from './form-transitions'; // Import form multi-stage
 // Import komponen notification cards dari folder notification-cards
 import {
   ErrorCard, // Card untuk error notification
-  InfoCard, // Card untuk info notification
   SuccessCard, // Card untuk success notification
-  WarningCard, // Card untuk warning notification
 } from './notification-cards';
 
 export default function TransitionPropertyPage() {
   // Hook untuk menangani scroll ke hash URL (untuk navigasi internal)
   useScrollToHash();
-  
+
   return (
     <>
       {/* Judul utama halaman */}
       <h1 className='display-xl-bold mb-lg text-neutral-25'>
         Transition Property
       </h1>
-      
+
       {/* Deskripsi halaman - menjelaskan tujuan pembelajaran */}
       <p className='mb-3xl text-lg-regular text-neutral-100'>
         Master the art of motion timing through hands-on practice. These
@@ -49,90 +46,67 @@ export default function TransitionPropertyPage() {
       {/* Container utama untuk semua practice dengan spacing vertikal */}
       <div className='space-y-3xl'>
         {/* Practice 1: Notification Cards - Fokus pada easing curves yang berbeda */}
-        <UIBlock defaultValue='success'> {/* Default tab yang aktif saat pertama kali load */}
+        <UIBlock defaultValue='success'>
+          {' '}
+          {/* Default tab yang aktif saat pertama kali load */}
           {/* Anchor untuk scroll navigation */}
           <div id='notification-cards' className='scroll-mt-24' />
-          
           {/* Judul practice 1 */}
           <UIBlockTitle>Practice 1: Notification Card Animations</UIBlockTitle>
-          
           {/* Deskripsi practice 1 - menjelaskan tujuan pembelajaran */}
           <UIBlockDescription>
             Create smooth notification animations with different easing curves.
             Each notification type should have a unique entrance that matches
             its urgency and tone.
           </UIBlockDescription>
-
           {/* List tab untuk switch antar jenis notification */}
           <UIBlockList>
             <UIBlockTrigger value='success'>Success</UIBlockTrigger>
-            <UIBlockTrigger value='warning'>Warning</UIBlockTrigger>
             <UIBlockTrigger value='error'>Error</UIBlockTrigger>
-            <UIBlockTrigger value='info'>Info</UIBlockTrigger>
           </UIBlockList>
-
           {/* Tombol untuk replay animasi */}
           <UIBlockReplayButton />
-
           {/* Konten untuk setiap tab notification */}
           <UIBlockContent value='success' className='items-stretch'>
             <SuccessCard />
           </UIBlockContent>
-          <UIBlockContent value='warning'>
-            <WarningCard />
-          </UIBlockContent>
           <UIBlockContent value='error'>
             <ErrorCard />
           </UIBlockContent>
-          <UIBlockContent value='info'>
-            <InfoCard />
-          </UIBlockContent>
-
           {/* Challenge/tantangan untuk practice 1 */}
           <UIBlockChallenge>
             <li>
-              <strong>Success:</strong> Smooth easeOut for reliability
+              <strong>Success:</strong> Tween easeOut — halus, reliable
             </li>
             <li>
-              <strong>Warning:</strong> backOut easing for attention
+              <strong>Error:</strong> Spring dari atas — urgency
             </li>
-            <li>
-              <strong>Error:</strong> Spring animation from top for urgency
-            </li>
-            <li>
-              <strong>Info:</strong> anticipate easing with slight rotation
-            </li>
-            <li>Icon should animate with spring physics after card appears</li>
-            <li>Text elements should slide in with staggered delays</li>
+            <li>Icon animate dengan spring + delay setelah card muncul</li>
+            <li>Title & message slide in dengan staggered delay</li>
           </UIBlockChallenge>
         </UIBlock>
 
         {/* Practice 2: Dashboard Cards - Fokus pada hover dan click interactions */}
-        <UIBlock defaultValue='revenue'> {/* Default tab revenue */}
+        <UIBlock defaultValue='revenue'>
+          {' '}
+          {/* Default tab revenue */}
           {/* Anchor untuk scroll navigation */}
           <div id='dashboard-cards' className='scroll-mt-24' />
-          
           {/* Judul practice 2 */}
           <UIBlockTitle>Practice 2: Dashboard Card Interactions</UIBlockTitle>
-
           {/* Deskripsi practice 2 - menjelaskan fokus pada per-property transitions */}
           <UIBlockDescription>
             Create sophisticated hover and click interactions using per-property
             transitions. Mix spring and tween animations for natural, responsive
             behavior.
           </UIBlockDescription>
-
           {/* List tab untuk switch antar jenis dashboard card */}
           <UIBlockList>
             <UIBlockTrigger value='revenue'>Revenue</UIBlockTrigger>
             <UIBlockTrigger value='users'>Users</UIBlockTrigger>
-            <UIBlockTrigger value='orders'>Orders</UIBlockTrigger>
-            <UIBlockTrigger value='conversion'>Conversion</UIBlockTrigger>
           </UIBlockList>
-
           {/* Tombol untuk replay animasi */}
           <UIBlockReplayButton />
-
           {/* Konten untuk setiap tab dashboard card */}
           <UIBlockContent value='revenue'>
             <RevenueCard />
@@ -140,13 +114,6 @@ export default function TransitionPropertyPage() {
           <UIBlockContent value='users'>
             <UsersCard />
           </UIBlockContent>
-          <UIBlockContent value='orders'>
-            <OrdersCard />
-          </UIBlockContent>
-          <UIBlockContent value='conversion'>
-            <ConversionCard />
-          </UIBlockContent>
-
           {/* Challenge/tantangan untuk practice 2 */}
           <UIBlockChallenge>
             <li>Hover: Lift with tween, background rotation with linear</li>
@@ -162,7 +129,7 @@ export default function TransitionPropertyPage() {
         <UIBlock>
           {/* Anchor untuk scroll navigation */}
           <div id='form-transitions' className='scroll-mt-24' />
-          
+
           {/* Judul practice 3 */}
           <UIBlockTitle>Practice 3: Multi-Stage Form Transitions</UIBlockTitle>
 
@@ -188,6 +155,8 @@ export default function TransitionPropertyPage() {
             <li>Back/Next buttons maintain proper state</li>
           </UIBlockChallenge>
         </UIBlock>
+
+     
       </div>
     </>
   );

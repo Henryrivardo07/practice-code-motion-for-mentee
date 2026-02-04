@@ -10,6 +10,7 @@ import {
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import { MotionCreatePractice } from './motion-create-practice';
 import { MotionPrefixPractice } from './motion-prefix-practice';
+import { MotionVsNoMotion } from './motionvsnomotion';
 
 export default function TheMotionComponentPage() {
   useScrollToHash();
@@ -24,6 +25,30 @@ export default function TheMotionComponentPage() {
       </p>
 
       <div className='space-y-3xl'>
+        {/* Practice 0: Motion vs No Motion */}
+        <UIBlock>
+          <div id='motion-vs-no-motion' className='scroll-mt-24' />
+          <UIBlockTitle>Practice 0: Motion vs No Motion</UIBlockTitle>
+          <UIBlockDescription>
+            Compare the difference between using motion.div with smooth
+            animations and regular div without any motion. Hover and interact
+            with both cards to see the difference!
+          </UIBlockDescription>
+
+          <UIBlockContent>
+            <MotionVsNoMotion />
+          </UIBlockContent>
+
+          <UIBlockChallenge>
+            <li>Compare motion.div with regular div side by side</li>
+            <li>Motion card has smooth spring animations on mount</li>
+            <li>Hover effects: scale, rotate, and shadow changes</li>
+            <li>Tap/click animation: scale down effect</li>
+            <li>Staggered animations for child elements</li>
+            <li>Regular div has no animations or interactions</li>
+          </UIBlockChallenge>
+        </UIBlock>
+
         {/* Practice 1: Using motion._prefix */}
         <UIBlock>
           <div id='motion-prefix' className='scroll-mt-24' />

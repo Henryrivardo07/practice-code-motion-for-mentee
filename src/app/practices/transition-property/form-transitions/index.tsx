@@ -1,7 +1,6 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { i } from 'motion/react-client';
 import { useState } from 'react';
 
 const steps = ['Personal Info', 'Account Setup', 'Preferences'];
@@ -9,6 +8,7 @@ type Step = 0 | 1 | 2 | 'success';
 
 export default function MultiStageForm() {
   const [step, setStep] = useState<Step>(0);
+  const [showPassword, setShowPassword] = useState(false);
 
   const next = () => {
     if (step === 2) setStep('success');
@@ -23,44 +23,71 @@ export default function MultiStageForm() {
   const activeIndex = typeof step === 'number' ? step : 3;
 
   return (
-    <div className='min-h-[140px] w-[300px] rounded-4xl border bg-white/60 p-6 shadow-lg ring-1 ring-black/5 dark:bg-neutral-900/40'>
-      {/* Progress bar with SPRING physics */}
-      <div className='mb-6'>
-        <div className='h-2 w-full overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-800'>
-          <motion.div
-            className='h-full rounded-full bg-sky-500'
-            initial={{ width: '0%' }}
-            animate={{ width: `${(activeIndex / 3) * 100}%` }}
-            transition={{ type: 'spring', stiffness: 240, damping: 28 }}
-          />
-        </div>
-
-        {/* Current step indicators (scale up smoothly) */}
-        <div className='mt-4 flex items-center gap-4 text-base'>
-          {['1', '2', '3'].map((n, i) => (
-            <motion.span
-              key={n}
-              className={`grid h-8 w-8 place-items-center rounded-full border ${
-                i <= activeIndex - 1
-                  ? 'border-sky-500 bg-sky-500 text-white'
-                  : i === activeIndex
-                    ? 'border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-100'
-                    : 'border-neutral-300 bg-transparent text-neutral-500 dark:border-neutral-700'
-              }`}
-              animate={{ scale: i === activeIndex ? 1.08 : 1 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 18 }}
-            >
-              {n}
-            </motion.span>
-          ))}
-          <span className='ml-auto text-base text-neutral-500'>
-            {isSuccess ? 'Review & Done' : steps[activeIndex]}
-          </span>
-        </div>
+    <div className='w-full max-w-[520px] rounded-3xl bg-gradient-to-br from-purple-900/40 via-purple-800/30 to-indigo-900/40 p-10 shadow-2xl shadow-purple-900/20 ring-1 ring-purple-700/30 backdrop-blur-sm'>
+      {/* Header */}
+      <div className='mb-8'>
+        <h1 className='mb-2 font-bold text-3xl text-white'>
+          {isSuccess ? 'Account Created!' : 'Create an account'}
+        </h1>
+        {!isSuccess && (
+          <p className='text-sm text-white/70'>
+            Step {activeIndex + 1} of 3 • {steps[activeIndex]}
+          </p>
+        )}
       </div>
 
+      {/* Progress bar with SPRING physics */}
+      {!isSuccess && (
+        <div className='mb-10'>
+          <div className='mb-4 h-2 w-full overflow-hidden rounded-full bg-purple-900/50 shadow-inner'>
+            <motion.div
+              className='h-full rounded-full bg-gradient-to-r from-purple-500 via-violet-500 to-indigo-500 shadow-lg shadow-purple-500/30'
+              initial={{ width: '0%' }}
+              animate={{ width: `${(activeIndex / 3) * 100}%` }}
+              transition={{ type: 'spring', stiffness: 240, damping: 28 }}
+            />
+          </div>
+
+          {/* Current step indicators */}
+          <div className='flex items-center gap-3'>
+            {['1', '2', '3'].map((n, i) => (
+              <motion.div
+                key={n}
+                className='flex items-center gap-3'
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <motion.span
+                  className={`grid h-10 w-10 place-items-center rounded-full border-2 font-bold text-sm transition-all duration-300 ${
+                    i <= activeIndex - 1
+                      ? 'border-purple-400 bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/40'
+                      : i === activeIndex
+                        ? 'border-purple-400/50 bg-purple-900/50 text-purple-300 shadow-md'
+                        : 'border-purple-800/50 bg-purple-900/30 text-purple-600'
+                  }`}
+                  animate={{ scale: i === activeIndex ? 1.1 : 1 }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+                >
+                  {n}
+                </motion.span>
+                {i < 2 && (
+                  <div
+                    className={`h-0.5 w-10 transition-all duration-500 ${
+                      i < activeIndex - 1
+                        ? 'bg-gradient-to-r from-purple-500 to-violet-500'
+                        : 'bg-purple-900/50'
+                    }`}
+                  />
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* FORM BODY — slide in from RIGHT with spring + staggered fields */}
-      <div className='relative min-h-[180px]'>
+      <div className='relative min-h-[400px]'>
         <AnimatePresence mode='wait'>
           {!isSuccess && typeof step === 'number' ? (
             <motion.form
@@ -69,47 +96,136 @@ export default function MultiStageForm() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -40, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 280, damping: 26 }}
-              className='grid gap-4'
+              className='grid gap-6'
               onSubmit={(e) => {
                 e.preventDefault();
                 next();
               }}
             >
-              {getFields(step).map((f, i) => (
-                <motion.label
-                  key={f.id}
-                  className='grid gap-1'
+              {/* Step 0: First name and Last name side by side */}
+              {step === 0 ? (
+                <div className='grid grid-cols-2 gap-4'>
+                  {getFields(step).map((f, i) => (
+                    <motion.label
+                      key={f.id}
+                      className='group grid gap-2'
+                      initial={{ y: 12, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{
+                        type: 'tween',
+                        ease: 'easeOut',
+                        duration: 0.22,
+                        delay: i * 0.06,
+                      }}
+                    >
+                      <span className='font-medium text-sm text-white/80'>
+                        {f.label}
+                      </span>
+                      <input
+                        required
+                        id={f.id}
+                        type={f.type || 'text'}
+                        placeholder={f.placeholder}
+                        className='h-40 w-full rounded-xl border border-purple-700/50 bg-purple-900/40 px-4 text-base text-white outline-none transition-all duration-300 placeholder:text-white/40 focus:border-purple-400 focus:bg-purple-900/60 focus:shadow-lg focus:shadow-purple-500/20'
+                      />
+                    </motion.label>
+                  ))}
+                </div>
+              ) : (
+                // Other steps: full width fields
+                getFields(step).map((f, i) => (
+                  <motion.label
+                    key={f.id}
+                    className='group grid gap-2'
+                    initial={{ y: 12, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{
+                      type: 'tween',
+                      ease: 'easeOut',
+                      duration: 0.22,
+                      delay: i * 0.06,
+                    }}
+                  >
+                    <span className='font-medium text-sm text-white/80'>
+                      {f.label}
+                    </span>
+                    <div className='relative'>
+                      <input
+                        required
+                        id={f.id}
+                        type={
+                          f.id === 'password'
+                            ? showPassword
+                              ? 'text'
+                              : 'password'
+                            : f.type || 'text'
+                        }
+                        placeholder={f.placeholder}
+                        className='h-40 w-full rounded-xl border border-purple-700/50 bg-purple-900/40 px-4 pr-12 text-base text-white outline-none transition-all duration-300 placeholder:text-white/40 focus:border-purple-400 focus:bg-purple-900/60 focus:shadow-lg focus:shadow-purple-500/20'
+                      />
+                      {f.id === 'password' && (
+                        <button
+                          type='button'
+                          onClick={() => setShowPassword(!showPassword)}
+                          className='-translate-y-1/2 absolute top-1/2 right-4 text-white/60 hover:text-white'
+                        >
+                          {showPassword ? '👁️' : '👁️‍🗨️'}
+                        </button>
+                      )}
+                    </div>
+                  </motion.label>
+                ))
+              )}
+
+              {/* Terms & Conditions checkbox for last step */}
+              {step === 2 && (
+                <motion.div
                   initial={{ y: 12, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{
                     type: 'tween',
                     ease: 'easeOut',
                     duration: 0.22,
-                    delay: i * 0.06, // STAGGER
+                    delay: 0.12,
                   }}
+                  className='flex items-center gap-3'
                 >
-                  <span className='text-base text-neutral-600 dark:text-neutral-300'>
-                    {f.label}
-                  </span>
                   <input
+                    type='checkbox'
+                    id='terms'
                     required
-                    id={f.id}
-                    placeholder={f.placeholder}
-                    className='h-12 rounded-xl border bg-white/80 px-4 text-base outline-none ring-1 ring-black/5 focus:ring-2 focus:ring-sky-500/50 dark:bg-white/10'
+                    className='h-5 w-5 rounded border-purple-700/50 bg-purple-900/40 text-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-purple-900'
                   />
-                </motion.label>
-              ))}
+                  <label htmlFor='terms' className='text-sm text-white/80'>
+                    I agree to the{' '}
+                    <button
+                      type='button'
+                      onClick={(e) => {
+                        e.preventDefault();
+                        // Handle terms click
+                      }}
+                      className='text-purple-300 underline hover:text-purple-200'
+                    >
+                      Terms & Conditions
+                    </button>
+                  </label>
+                </motion.div>
+              )}
 
-              <div className='mt-4 flex items-center justify-between'>
-                <button
-                  type='button'
-                  onClick={back}
-                  className='rounded-xl border px-4 py-2 text-base hover:bg-neutral-50 dark:hover:bg-neutral-800'
-                  disabled={step === 0}
-                >
-                  Back
-                </button>
+              <div className='mt-6 flex items-center justify-between gap-4'>
+                {step > 0 && (
+                  <motion.button
+                    type='button'
+                    onClick={back}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className='rounded-xl border border-purple-700/50 bg-purple-900/40 px-6 py-3 font-medium text-base text-white/80 transition-all duration-300 hover:bg-purple-900/60 hover:text-white'
+                  >
+                    Back
+                  </motion.button>
+                )}
                 <motion.button
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   transition={{
                     type: 'spring',
@@ -118,9 +234,11 @@ export default function MultiStageForm() {
                     mass: 0.4,
                   }}
                   type='submit'
-                  className='rounded-xl bg-sky-600 px-6 py-2 font-medium text-base text-white hover:bg-sky-700'
+                  className={`rounded-xl bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 px-10 py-4 font-bold text-base text-white shadow-purple-500/30 shadow-xl transition-all duration-300 hover:from-purple-500 hover:via-violet-500 hover:to-indigo-500 hover:shadow-2xl hover:shadow-purple-500/40 ${
+                    step === 0 ? 'w-full' : 'ml-auto'
+                  }`}
                 >
-                  Next
+                  {step === 2 ? 'Create account' : 'Next'}
                 </motion.button>
               </div>
             </motion.form>
@@ -137,7 +255,7 @@ export default function MultiStageForm() {
                   transition: { staggerChildren: 0.08, when: 'beforeChildren' },
                 },
               }}
-              className='grid place-items-center text-center'
+              className='grid place-items-center py-10 text-center'
             >
               <motion.div
                 variants={{
@@ -148,7 +266,7 @@ export default function MultiStageForm() {
                     transition: { type: 'spring', stiffness: 340, damping: 18 },
                   },
                 }}
-                className='mb-3 grid h-20 w-20 place-items-center rounded-full bg-emerald-500 text-2xl text-white'
+                className='mb-6 grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-purple-500 via-violet-500 to-indigo-500 text-4xl text-white shadow-2xl shadow-purple-500/40'
               >
                 ✓
               </motion.div>
@@ -165,9 +283,9 @@ export default function MultiStageForm() {
                     },
                   },
                 }}
-                className='font-semibold text-xl'
+                className='font-bold text-3xl text-white'
               >
-                All Set!
+                Account Created!
               </motion.h3>
               <motion.p
                 variants={{
@@ -183,9 +301,9 @@ export default function MultiStageForm() {
                     },
                   },
                 }}
-                className='mt-2 text-base text-neutral-600 dark:text-neutral-300'
+                className='mt-3 text-lg text-white/70'
               >
-                Your profile has been created successfully.
+                Your account has been created successfully.
               </motion.p>
 
               <motion.button
@@ -202,8 +320,13 @@ export default function MultiStageForm() {
                     },
                   },
                 }}
-                onClick={() => setStep(0)}
-                className='mt-6 rounded-xl border px-6 py-2 text-base hover:bg-neutral-50 dark:hover:bg-neutral-800'
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setStep(0);
+                  setShowPassword(false);
+                }}
+                className='mt-8 rounded-xl border border-purple-700/50 bg-purple-900/40 px-8 py-4 font-semibold text-base text-white/80 transition-all duration-300 hover:bg-purple-900/60 hover:text-white'
               >
                 Create another
               </motion.button>
@@ -218,18 +341,48 @@ export default function MultiStageForm() {
 function getFields(step: 0 | 1 | 2) {
   if (step === 0) {
     return [
-      { id: 'name', label: 'Full name', placeholder: 'John Appleseed' },
-      { id: 'email', label: 'Email address', placeholder: 'you@example.com' },
+      {
+        id: 'firstName',
+        label: 'First name',
+        placeholder: 'Fletcher',
+        type: 'text',
+      },
+      {
+        id: 'lastName',
+        label: 'Last name',
+        placeholder: 'Last name',
+        type: 'text',
+      },
     ];
   }
   if (step === 1) {
     return [
-      { id: 'username', label: 'Username', placeholder: 'your_handle' },
-      { id: 'password', label: 'Password', placeholder: '••••••••' },
+      {
+        id: 'email',
+        label: 'Email',
+        placeholder: 'Email',
+        type: 'email',
+      },
+      {
+        id: 'password',
+        label: 'Password',
+        placeholder: 'Enter your password',
+        type: 'password',
+      },
     ];
   }
   return [
-    { id: 'timezone', label: 'Timezone', placeholder: 'Asia/Jakarta' },
-    { id: 'language', label: 'Language', placeholder: 'English' },
+    {
+      id: 'timezone',
+      label: 'Timezone',
+      placeholder: 'Timezone',
+      type: 'text',
+    },
+    {
+      id: 'language',
+      label: 'Language',
+      placeholder: 'Language',
+      type: 'text',
+    },
   ];
 }

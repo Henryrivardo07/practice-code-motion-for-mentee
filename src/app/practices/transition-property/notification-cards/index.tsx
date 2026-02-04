@@ -1,78 +1,60 @@
 'use client';
 
-import { motion, type Variants } from 'motion/react';
+import { motion, type Transition } from 'motion/react';
 import { useId } from 'react';
 
-type CardProps = {
-  title: string;
-  message: string;
-  tone: 'success' | 'warning' | 'error' | 'info';
-  // Optional: override class
-  className?: string;
-};
+/*
+ * ═══ INTI MATERI MOTION (Notification Card) ═══
+ * 1. initial / animate → masuk dari state A ke B
+ * 2. transition → tween (ease, duration) vs spring (stiffness, damping)
+ * 3. Tween easeOut → halus, bisa diprediksi (reliability)
+ * 4. Spring → natural bounce, cocok untuk urgency/attention
+ * 5. Icon & teks: animasi bertahap (delay) setelah card muncul
+ */
 
-// Simple tone styles
-const toneStyle: Record<CardProps['tone'], string> = {
+type Tone = 'success' | 'error';
+
+const toneStyle: Record<Tone, string> = {
   success:
     'bg-emerald-600/10 border-emerald-600/30 text-emerald-900 dark:text-emerald-100',
-  warning:
-    'bg-amber-500/10 border-amber-500/30 text-amber-900 dark:text-amber-100',
   error: 'bg-rose-600/10 border-rose-600/30 text-rose-900 dark:text-rose-100',
-  info: 'bg-sky-600/10 border-sky-600/30 text-sky-900 dark:text-sky-100',
 };
 
-const iconDot: Record<CardProps['tone'], string> = {
+const iconDot: Record<Tone, string> = {
   success: 'bg-emerald-500',
-  warning: 'bg-amber-500',
   error: 'bg-rose-500',
-  info: 'bg-sky-500',
 };
 
-const childrenVariants: Variants = {
-  hidden: { y: 8, opacity: 0 },
-  visible: (i: number) => ({
-    y: 0,
-    opacity: 1,
-    transition: {
-      delay: i * 0.06,
-      type: 'tween',
-      ease: 'easeOut',
-      duration: 0.22,
-    },
-  }),
-};
-
-function BaseCard({
+function NotificationCard({
+  tone,
   title,
   message,
-  tone,
-  className,
-  containerProps,
-  iconTransition,
-  cardTransition,
   initial,
   animate,
+  cardTransition,
+  iconTransition,
   extra,
-}: CardProps & {
-  containerProps?: React.ComponentProps<typeof motion.div>;
-  iconTransition: React.ComponentProps<typeof motion.div>['transition'];
-  cardTransition: React.ComponentProps<typeof motion.div>['transition'];
+}: {
+  tone: Tone;
+  title: string;
+  message: string;
   initial: React.ComponentProps<typeof motion.div>['initial'];
   animate: React.ComponentProps<typeof motion.div>['animate'];
+  cardTransition: Transition;
+  iconTransition: Transition;
   extra?: React.ReactNode;
 }) {
   const id = useId();
   return (
     <motion.div
-      key={id} // memudahkan replay dari UIBlockReplayButton yang re-mount konten
-      className={`min-h-[140px] w-[300px] rounded-4xl border p-6 shadow-lg md:p-2xl ${toneStyle[tone]} ${className || ''}`}
+      key={id}
+      className={`min-h-[140px] w-[300px] rounded-4xl border p-6 shadow-lg ${toneStyle[tone]}`}
       initial={initial}
       animate={animate}
       transition={cardTransition}
-      {...containerProps}
     >
       <div className='flex items-start gap-4'>
-        {/* Icon pop with spring after card appears */}
+        {/* Icon: pop in dengan spring + delay */}
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -84,24 +66,31 @@ function BaseCard({
 
         <div className='flex-1'>
           <motion.h4
-            custom={0}
-            variants={childrenVariants}
-            initial='hidden'
-            animate='visible'
+            initial={{ y: 8, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{
+              delay: 0.06,
+              type: 'tween',
+              ease: 'easeOut',
+              duration: 0.22,
+            }}
             className='font-semibold text-lg leading-tight'
           >
             {title}
           </motion.h4>
           <motion.p
-            custom={1}
-            variants={childrenVariants}
-            initial='hidden'
-            animate='visible'
+            initial={{ y: 8, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{
+              delay: 0.12,
+              type: 'tween',
+              ease: 'easeOut',
+              duration: 0.22,
+            }}
             className='mt-2 text-base leading-relaxed opacity-90'
           >
             {message}
           </motion.p>
-
           {extra}
         </div>
       </div>
@@ -109,12 +98,10 @@ function BaseCard({
   );
 }
 
-/**
- * SUCCESS — tween easeOut, durasi singkat (reliability)
- */
+/** Success — tween easeOut: halus, reliable */
 export function SuccessCard() {
   return (
-    <BaseCard
+    <NotificationCard
       tone='success'
       title='Payment Successful'
       message='Your payment has been processed.'
@@ -131,38 +118,10 @@ export function SuccessCard() {
   );
 }
 
-/**
- * WARNING — tween dengan backOut untuk "popped attention"
- */
-export function WarningCard() {
-  return (
-    <BaseCard
-      tone='warning'
-      title='Unusual Activity'
-      message='We detected a login from a new device.'
-      initial={{ y: 24, scale: 0.96, opacity: 0 }}
-      animate={{ y: 0, scale: 1, opacity: 1 }}
-      cardTransition={{
-        type: 'tween',
-        ease: 'backOut', // back/anticipate family
-        duration: 0.4,
-      }}
-      iconTransition={{
-        type: 'spring',
-        stiffness: 340,
-        damping: 14,
-        delay: 0.14,
-      }}
-    />
-  );
-}
-
-/**
- * ERROR — spring from TOP (urgency)
- */
+/** Error — spring dari atas: urgency */
 export function ErrorCard() {
   return (
-    <BaseCard
+    <NotificationCard
       tone='error'
       title='Payment Failed'
       message='Your card was declined. Try a different method.'
@@ -197,28 +156,6 @@ export function ErrorCard() {
           </div>
         </motion.div>
       }
-    />
-  );
-}
-
-/**
- * INFO — anticipate easing + slight rotation
- */
-export function InfoCard() {
-  return (
-    <BaseCard
-      tone='info'
-      title='New Feature Available'
-      message='Explore advanced filters in your dashboard.'
-      initial={{ y: 12, rotate: -2, opacity: 0 }}
-      animate={{ y: 0, rotate: 0, opacity: 1 }}
-      cardTransition={{ type: 'tween', ease: 'anticipate', duration: 0.42 }}
-      iconTransition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 16,
-        delay: 0.12,
-      }}
     />
   );
 }

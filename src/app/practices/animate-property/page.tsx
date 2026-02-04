@@ -5,14 +5,17 @@ import {
   UIBlockChallenge,
   UIBlockContent,
   UIBlockDescription,
+  UIBlockList,
   UIBlockReplayButton,
   UIBlockTitle,
+  UIBlockTrigger,
 } from '@/components/ui/ui-block';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import { AnimateBasicsPractice } from './animate-basics-practice';
 import { AnimateWithStatePractice } from './animate-with-state-practice';
 import { ColorTransitionsPractice } from './color-transitions-practice';
 import { InteractivePositioningPractice } from './interactive-positioning-practice';
+import { TransformOriginPractice } from './transform-origin-practice';
 
 export default function AnimatePropertyPage() {
   useScrollToHash();
@@ -114,6 +117,44 @@ export default function AnimatePropertyPage() {
             <li>Spring physics for smooth expansion</li>
             <li>Hover and tap interactions remain active</li>
             <li>State changes trigger automatic animations</li>
+          </UIBlockChallenge>
+        </UIBlock>
+
+        {/* Practice 5: Transform Origin Control */}
+        <UIBlock defaultValue='center'>
+          <div id='transform-origin' className='scroll-mt-24' />
+          <UIBlockTitle>Practice 5: Transform Origin Control</UIBlockTitle>
+          <UIBlockDescription>
+            Change the origin point to see how it affects scale animations.
+          </UIBlockDescription>
+
+          <UIBlockList>
+            <UIBlockTrigger value='top-left'>top-left</UIBlockTrigger>
+            <UIBlockTrigger value='center'>center</UIBlockTrigger>
+            <UIBlockTrigger value='bottom-right'>bottom-right</UIBlockTrigger>
+          </UIBlockList>
+
+          <UIBlockReplayButton />
+
+          <UIBlockContent value='top-left'>
+            <TransformOriginPractice origin='top-left' />
+          </UIBlockContent>
+
+          <UIBlockContent value='center'>
+            <TransformOriginPractice origin='center' />
+          </UIBlockContent>
+
+          <UIBlockContent value='bottom-right'>
+            <TransformOriginPractice origin='bottom-right' />
+          </UIBlockContent>
+
+          <UIBlockChallenge>
+            <li>Square scales from selected origin point</li>
+            <li>Transform origin changes animation appearance</li>
+            <li>Initial scale is 0 (completely collapsed)</li>
+            <li>Initial opacity is 0 (invisible)</li>
+            <li>Animation duration: 0.6 seconds</li>
+            <li>Uses easeOut for smooth expansion</li>
           </UIBlockChallenge>
         </UIBlock>
       </div>

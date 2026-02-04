@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/ui-block';
 import { useScrollToHash } from '@/hooks/use-scroll-to-hash';
 import { TransformOriginPractice } from '../animate-property/transform-origin-practice';
+import { ExamplePractice } from './example-practice';
 import { FadeScalePractice } from './fade-scale-practice';
 import { SkillCardPractice } from './skill-card-practice';
 import { SlideDirectionPractice } from './slide-direction-practice';
@@ -29,6 +30,30 @@ export default function InitialPropertyPage() {
       </p>
 
       <div className='space-y-3xl'>
+        {/* Practice 0: Example */}
+        <UIBlock>
+          <div id='example' className='scroll-mt-24' />
+          <UIBlockTitle>Practice 0: Example</UIBlockTitle>
+          <UIBlockDescription>
+            A simple example demonstrating how the initial property sets the
+            starting state for animations.
+          </UIBlockDescription>
+
+          <UIBlockReplayButton />
+
+          <UIBlockContent>
+            <ExamplePractice />
+          </UIBlockContent>
+
+          <UIBlockChallenge>
+            <li>Element starts invisible (opacity: 0)</li>
+            <li>Element starts 20px above its final position (y: -20)</li>
+            <li>Animation duration is 0.6 seconds</li>
+            <li>Uses easeOut timing for smooth movement</li>
+            <li>Element animates to visible and final position</li>
+          </UIBlockChallenge>
+        </UIBlock>
+
         {/* Practice 1: Fade and Scale Entrance */}
         <UIBlock>
           <div id='fade-scale' className='scroll-mt-24' />
